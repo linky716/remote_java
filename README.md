@@ -1,5 +1,4 @@
-this is a readme.md
+# Note Directory
 
-this is a java learning log.
-
-this is a change from vscode editor.  
+# 工具
+* [Git](https://github.com/linky716/remote_java/blob/master/git.md) 
