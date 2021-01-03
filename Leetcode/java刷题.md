@@ -7,7 +7,7 @@ notebook: Java
 有效的括号：
 * 思路：括号的正确组织方式要与出栈的思维对应，这主要考察对栈的理解。
 * 代码：
-    * ```java
+     ```java
     class Solution {
     public static char match(char ch) {
         char ans='0';
@@ -577,5 +577,35 @@ class Solution {
     }
 }
 
+```
+108.有序数组转换平衡二叉搜索树
+* 思路：还是递归思想，首先看函数的功能是返回给定有序数组的平衡二叉树根节点，这样就可以看出这是一个递归问题，对于每一级的节点，都利用函数返回其平衡二叉搜索树即可。问题分为两步：
+1. 将数组的中间节点作为根节点
+2. 数组分为两部分，分别调用函数获取上述根节点的左右子节点。
+如此递归即可。
+```java
+class Solution {
+    public TreeNode sortedArrayToBST(int[] nums) {
+        int len = nums.length;
+        if (len == 1) {
+            TreeNode r = new TreeNode(nums[0]);
+            return r;
+        }
+        if( len == 0)return null;
+
+        TreeNode r = new TreeNode(nums[len/2]);
+        int[] num1 = new int[len/2];
+        int[] num2 = new int[len -len/2 -1];
+        for (int i = 0;i<len/2;i++) {
+            num1[i] = nums[i];
+            if(i < (len - len/2 -1))num2[i] = nums[len/2 + i +1];
+        }
+        r.left = sortedArrayToBST(num1);
+        r.right = sortedArrayToBST(num2);
+
+        return r;
+
+    }
+}
 
 ```
