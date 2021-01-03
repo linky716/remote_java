@@ -609,3 +609,62 @@ class Solution {
 }
 
 ```
+110.平衡二叉树
+* 思路：这题还是要递归的思路，但是要考虑到末级递归要判断是否平衡，第一级要判断两边是否平衡，因此每一级的递归需要两个参数：
+1. 当前节点是否平衡
+2. 上一级节点的两边是否平衡
+```java
+class Solution {
+    public boolean isBalanced(TreeNode root) {
+        if (root == null) return true;
+        if (root.left == null || root.right == null) {
+            if (Math.abs(deep(root.left)-deep(root.right)) <= 1)
+            return true;
+            else return false;
+        }
+        if(isBalanced(root.left) && isBalanced(root.right)) {
+            if (Math.abs(deep(root.left)-deep(root.right)) <= 1)
+            return true;
+            else return false;
+        }
+        return false;
+
+
+    }
+    public int deep (TreeNode root) {
+        if(root == null)
+        return 0;
+        int l = 1+deep(root.left);
+        int r = 1+deep(root.right);
+        return Math.max(l,r);
+    }
+}
+
+```
+111.二叉树最小深度
+* 思路：最小深度是比较简单的只要取递归过程中的最小值就可以，但是要注意根节点的左子树为空的情况，因为最小深度是到叶子节点，所以根节点是不算的，故而要排除这种情况。本题待优化。
+```java
+class Solution {
+    public int minDepth(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+
+        if (root.left == null && root.right == null) {
+            return 1;
+        }
+
+        int min_depth = Integer.MAX_VALUE;
+        if (root.left != null) {
+            min_depth = Math.min(minDepth(root.left), min_depth);
+        }
+        if (root.right != null) {
+            min_depth = Math.min(minDepth(root.right), min_depth);
+        }
+
+        return min_depth + 1;
+    }
+}
+
+```
+
