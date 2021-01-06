@@ -668,3 +668,117 @@ class Solution {
 
 ```
 
+118.杨辉三角
+* 思路：在给定规则的基础上实现双循环遍历就可以得到数组。边界值的处理可以直接赋值。
+```java
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> ans = new ArrayList<>();
+        if (numRows == 0)
+        return ans;
+        for (int i = 0;i< numRows;i++) {
+            List<Integer> row = new ArrayList();
+            for (int j=0;j<=i;j++) {
+                if ((j==0 ||j==i)) {
+                    row.add(1);
+                }
+                else {
+                    row.add(ans.get(i-1).get(j)+ans.get(i-1).get(j-1));
+                }
+            }
+            ans.add(row);
+        }
+        return ans;
+    }
+
+```
+
+118.杨辉三角II
+* 思路：杨辉三角每一行的元素数值符合组合规律C(m,n)，获取某一行的元素只需要依次计算即可，这样做的优点是算法前面每一行的值不用计算，复杂度为k。C(m,n)与C(m,n-1)之间相差一个(m-n+1)/n.
+```java
+class Solution {
+    public List<Integer> getRow(int rowIndex) {
+        List<Integer> ans = new ArrayList<>();
+        for (int i = 0;i<= rowIndex;i++) {
+            if(i== 0 || i== rowIndex) ans.add(1);
+            else ans.add(ans.get(i-1)*(rowIndex-i+1)/i);
+        }
+        return ans;
+
+    }
+}
+
+```
+
+121.买卖股票的最佳时机
+* 思路：要寻找最大差值，就要向后寻找买入最小值，同时计算后面元素与前面元素的差值，并计算该值与前值的最大值。要记录两个数字：
+1. 买入的最小值
+2. 目前可得的最大利润
+```java
+    public int maxProfit(int[] prices) {
+        if (prices.length == 0) return 0;
+        int min = prices[0],pre = 0;
+        for (int i = 0;i<prices.length;i++) {
+            min = Math.min(min,prices[i]);
+            int val = prices[i] - min > 0? prices[i] -min:0;
+            pre = Math.max(pre,val); 
+        }
+        return pre;
+    }
+
+```
+122.买入股票最佳时机II
+* 思路：要想使多次买卖的值最大，只要在买入的过程中累加每一次有差值的收益即可。
+```java
+    public int maxProfit(int[] prices) {
+        if (prices.length == 0) return 0;
+        int min = prices[0],pre = 0;
+
+        for (int i = 0;i< prices.length;i++) {
+            min = Math.min(min,prices[i]);
+            int val = prices[i] - min >0 ? prices[i]-min:0;
+            pre+=val;
+            min=prices[i];
+        }
+        return pre;
+    }
+
+```
+环形链表
+* 思路：快慢指针。当链表成环，慢指针一定会与快指针重合，这时可以判断链表环路。
+```java
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if (head == null || head.next == null) {
+            return false;
+        }
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while (slow != fast) {
+            if (fast == null || fast.next == null) {
+                return false;
+            }
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return true;
+    }
+}
+
+```
+* 思路2：最大值不重复：遍历链表的同时将遍历过的位置赋值为最大值。当未遍历过的节点出现最大值，说明链表成环。
+```java
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        int val =Integer.MAX_VALUE;
+        while (head != null) {
+            head.val = val;
+            head = head.next;
+            if(head!=null && head.val == val) return true ;
+        }
+        return false;
+
+    }
+}
+
+```
+* 思路3：哈希表（待补充）
