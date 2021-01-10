@@ -781,4 +781,144 @@ public class Solution {
 }
 
 ```
-* 思路3：哈希表（待补充）
+* 思路3：Set集合添加每个节点，当有重合时，会返回旧值，以此作为判断该节点是否被遍历过，从而判断出结果。
+```java
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        Set<ListNode> seen = new HashSet<ListNode>();
+        while (head != null) {
+            if (!seen.add(head)) {
+                return head;
+            }
+            head = head.next;
+        }
+        return null;
+    }
+}
+
+```
+
+155.最小栈
+* 思路：本题的难点在于常数之间返回栈中最小元素。在取最小值时，采用辅助栈来记录最小元素。同时要记得当原栈弹出最小值时，辅助栈也要对应弹出。判断辅助栈是否压栈的时候，等号也要取，否则可能会有访问空指针的情况发生。
+```java
+class MinStack {
+    Stack<Integer> stack;
+    Stack<Integer> xStack;
+    /** initialize your data structure here. */
+    public MinStack() {
+        stack = new Stack<>();
+        xStack = new Stack<>();
+    }
+    
+    public void push(int x) {
+        stack.push(x);
+        if(xStack.isEmpty() || x <= xStack.peek())
+        xStack.push(x);
+    }
+    
+    public void pop() {
+        if(stack.pop().equals(xStack.peek()))
+        xStack.pop();
+    }
+    
+    public int top() {
+        return stack.peek();
+    }
+    
+    public int getMin() {
+        return xStack.peek();
+    }
+}
+
+```
+160.相交链表
+* 哈希遍历：使用哈希表先对其中一条链遍历，然后再对第二条遍历，当遇到重复的节点，哈希表判断值。
+* 双指针法：定义两个指针p1,p2，分别指向headA和headB，当p1指针到达终点时，返回headB的位置，p2到达末尾时返回headA的位置。设两个节点到相交点的距离为a，b,相交点到末尾的长度为c，则以该方式遍历，在相交点会有a+c+b=b+c+a，因此当两个指针相遇时就是所求节点。这类题需要灵活使用指针，观察两者之间的关系，寻求解决。
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB== null)
+        return null;
+        ListNode p1 = headA,p2 = headB;
+        while(p1 != p2) {
+            p1 = (p1 == null)?headB:p1.next;
+            p2 =( p2 == null)?headA:p2.next;
+        }
+        return p2;
+    }
+}
+
+```
+167.两数之和2
+* 首先想到的是双指针，接着要缩短查找空间，右边界大于target肯定不行，于是计算好右边界才正式开始移动指针。移动的时候左右同时移动，这样是比较省时间，但是也会漏掉左值和右值比较接近的情况，因此不能设置左值小于右值，在计算结束后排序即可。
+```java
+class Solution {
+    public int[] twoSum(int[] numbers, int target) {
+        int i=0,j=numbers.length-1; 
+        while(numbers[j]>target)j--;
+        while(numbers[i]+numbers[j] != target) {
+            if(numbers[i]+numbers[j]<target)i++;
+            if(numbers[i]+numbers[j]>target)j--;
+        }
+        int[] ans = {i+1,j+1};
+        Arrays.sort(ans);
+        return ans;
+        
+    }
+}
+
+```
+168.Excel表达的名称
+* 一道小题花了很久的时间，反思了一下做题的不足。上来做题就应该把最核心的部分思考好，之后再动手，难的不是框架，而是这最关键的部分。边界条件的处理很重要，当n为26的整数倍的时候，一边是添加字符，另一边数字的处理要减去26，再除以26。想清楚这两点，问题就解决了。
+```java
+class Solution {
+    public String convertToTitle(int n) {
+        StringBuilder res = new StringBuilder();
+        while(n != 0) {
+            if (n % 26 == 0) {
+                res.append('Z');
+                n -= 26;
+                n/=26;
+            }
+            else if(n% 26 != 0) {
+                res.append((char)(n%26 +'A'-1));
+                n/=26;
+            }
+        }
+        return res.reverse().toString();
+    }
+}
+
+```
+169.多数元素
+* 排序整理：排序后相同的元素放在一起，使用一个变量做计数，每次数字改变时，做一次比较，当次数大于n/2时，为答案。时间复杂度为nlogn，主要的开销在开始的排序上。
+```java
+    public int majorityElement(int[] nums) {
+        Arrays.sort(nums);
+        int time = 0,temp = nums[0];
+        for(int i = 0;i<nums.length;i++) {
+            if(temp == nums[i])
+            time++;
+            if(temp != nums[i]) {
+                if(time >nums.length/2) break;
+                temp = nums[i];
+                time=1;
+            }
+        }
+        return temp;
+    }
+
+```
+172.阶乘后的零
+* 阶乘的时间复杂度很高，而本题要求logn复杂度，因此不能就算阶乘再统计。考虑不计算阶乘，末尾的零是由因式里的10产生的，因此考虑因式中能分解多少个5。找到这个思路，后面的统计就好做了，累加除以5的结果，能得到因式中5的数量，即为答案。
+```java
+    public int trailingZeroes(int n) {
+        int num =0;
+        while(n != 0) {
+            num += n/5;
+            n /= 5;
+        }
+        return num;
+    }
+
+```

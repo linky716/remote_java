@@ -199,3 +199,124 @@ this:本类
 虚拟方法表用子类重写的方法覆盖父类的方法
 
 
+抽象类
+* 抽象类是有抽象方法的类
+* 抽象方法是只有方法声明，没有方法体的方法
+* 抽象类用于实现暂不清楚需求的方法，将具体实现放到子类中
+* 抽象类特点：
+    * 修饰符：abstract
+    * 不能实例化，只能在子类中实例化 new
+    * 抽象类子类的两个选择：
+        * 定义成抽象类
+        * 重写父类的抽象方法
+
+* 抽象类成员特点
+    * 可以是普通变量，也可以是成员常量
+    * 成员方法：可以有普通方法，也可以有抽象方法
+    * 构造方法：像普通类一样构造方法，且可以重载
+抽象类中的成员比普通类多了一种抽象方法
+
+子类一般有两个构造方法，子类的空参构造访问父类的空参构造，子类的全参构造访问父类的全参构造。
+
+final关键字：
+* 修饰类：不能被继承
+* 修饰方法：不能被重写，不能与abstract共存
+* 修饰变量：最终变量，即常量，不能修改。不建议修饰引用类型，因为仍然可以通过引用修改，意义不大。
+
+static:
+* 修饰成员变量被本类所有对象共享
+* 不想被修改可以使用final关键字
+* 修饰成员方法： 
+    * 静态方法中没有对象this，所以不能访问非静态成员
+    * 使用场景： 只需要访问静态成员，不需要访问对象状态，所需参数由参数列表提供
+
+接口：
+* 接口概述：接口用于描述类的功能而不给出具体实现，类要遵从接口提供的同意规则进行定义，所以接口时对外提供的一组规则、标准
+    * 定义： public interface 接口名 {}
+    * 接口成员由默认修饰符pubblic abstract
+* 接口创建对象的特点：
+    * 不能实例化
+    * 子类可以是抽象类，也可以是普通类
+    * 接口与接口是继承关系
+    * 接口中定义的是扩展功能，父类中定义共性内容
+* 接口成员特点：
+    * 成员变量默认修饰public static final
+    * JDK8可以写静态方法，也可以非静态方法。非静态方法要加关键字default
+    * JDK9多了private方法
+    * 没有构造方法，因为不可实例化
+
+API
+* 基本概念：
+    * JAVA提供的类使用说明书
+    * 模块 包  类
+    * javsSE包含核心库
+* API使用：
+    * Object类：所有类的顶层基类  
+    * java.lang包下的类不需要导包，直接使用
+    * 成员方法： hashCode toString(默认打印地址值) equals getClass(获取字节码文件)
+        * 地址值：包名+类名+对象哈希码值无符号十六进制
+        * 实际开发中一般会重写toString和equals方法
+* Scanner
+    * hasNext:判断是否还有下一个输入项
+    * next：获取下一个输入项
+    * hasNextInt判断录入是否是整数
+    * next结束标记空白字符（回车、换行、tab）
+
+* String
+    * 指定字节数组转成字符串
+    * 指定字符数转换字符串
+    * indexOf subString length charAt lastIndexOf
+    * 成员方法 valueOf replace(old,new) getBytes toCharArray split trim去除字符串两端空白字符
+    * stringBuilder stringBuffer 可变字符序列
+        * stringBuilder() 空白构造
+        * stringBuilder(str) 参数构造
+        * append方法：添加字符串并返回自身
+* Date Calendar
+    * Date构造一个日期对象，系统时间，精确到ms
+    * 成员方法 getTime日期对象转换时间精确到ms值
+    * get(filed)
+基本类型的包装类：
+
+* 基本类型不是对象，因此java提供了对应的包装类
+    * 装箱：基本类型转包装类型
+    * 拆箱
+    * 成员方法 statuc 基本类型 parsexxx(string) 将字符串类型转换成对应基本类型
+    Interger c = 20;
+
+# 集合：存储多个数据的容器
+
+## 单列集合 List set
+list
+* 特点：可重复、有序（存取顺序相同）
+* add方法添加 get获取 size大小
+* ArrayList  
+增强for循环：
+* for (数据类型 变量名:数组或集合对象){循环体 变量即元素}
+* 增强for是迭代器的简写
+
+迭代器
+* Iterator it = list.iterator()
+* 并发修改：遍历时修改会冲突
+* 列表迭代器
+
+泛型：一般只和集合类结合使用
+* 更安全
+* 避免了类型转换
+
+Collections工具类：
+* sort max reverse shuffle(随机置换)
+
+set集合：
+* 不可重复、无序
+* Set<Integer> s = new HashSet<>();
+* Set保证元素的唯一性依赖equals()和hashCode()两个方法
+
+Map
+* 双列集合
+* put将元素添加 key:ksySet()
+    * 新值添加返回null，重复添加返回旧值，新值覆盖旧值
+
+* Map<Integer,String> m = new HashMap<>(); 
+
+
+
