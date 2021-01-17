@@ -313,10 +313,113 @@ set集合：
 
 Map
 * 双列集合
-* put将元素添加 key:ksySet()
+* put将元素添加 key:keySet()
     * 新值添加返回null，重复添加返回旧值，新值覆盖旧值
 
 * Map<Integer,String> m = new HashMap<>(); 
+* key = m.keyset();
 
 
+java常用工具__IO流
+* 基本概念
+* 异常概述
+    * exception：合理的需要捕获的异常，可以预料，需要解决
+    * error:合理的，不需要捕获的异常，比如栈溢出，不可预料
+    * JVM默认的异常处理方式：打印异常并终止程序
+        * try catch：捕获自己处理
+        * throws：抛出交给程序员处理
+            * 不处理，接着抛，抛给JVM
+        * finally里的代码用于释放资源，一般情况下一定会执行
+        
+* IO流的概述：java中传输数据的方式
+    * 字节流(stream)、字符流(reader writer)
+        * InputStream字节输入流顶层抽象类 OutputStream
+        * File(普通) Buffer(高效)
+    * 读数据、写数据
+    * File类：
+        * 代表某个文件或者文件夹
+        * 构造方法：
+            * File(String pathname)
+            * File(String parent,String child)
+            * File(File parent,String child)
+        * 成员方法：
+            * createNewFile():创建文件,不存在则创建并返回true，否则返回false
+            * mkdir()和mkdirs():创建目录(多级)
+            * isDirectory()判断对象是否为目录
+            * isFile()
+            * exits()
+            * getAbsolutelyPath()获取绝对路径
+            * getPath()获取(当前项目目录)相对路径
+            * list获取指定目录下所有文件（夹）名称数组
+            * getName()获取文件名
+    * 字符流读数据
+        * 一次读一个字符
+        ```java
+            Reader reader = new FileReader("files/f1");
+            int ch;
+            while((ch = reader.read())!= -1){
+            System.out.println(ch);
+            }
+        
+        ```
+        * 一次读一个数组，返回读取的有效长度 read(ch)
+    * 字符流写数据：
+        ```java
+        Writer write = new FileWriter("1.txt")
+        reader.write(ch,0,2);
+        ```
+    * 字符流拷贝文件
+        ```java
+        Writer writer = new FileWriter("files/1.txt");
+        Reader reader = new FileReader("files/f1");
+        char[] ch = new char[2048];
+        while ((reader.read(ch)) != -1) {
+            writer.write(ch);
+        }
 
+        reader.close();
+        writer.close();
+        
+        ```
+    * 字符缓冲流读写文件
+        ```java
+        BufferedReader br = new BufferedReader(new FileReader("files/f1"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter("files/1.txt"));
+
+        String str;
+        while((str = br.readLine())!= null) {
+            bw.write(str);
+            bw.newLine();
+        }
+        br.close();
+        bw.close();
+        ```
+    * 字节流读写文件
+        ```java
+        FileInputStream fr = new FileInputStream("files/a.png");
+        FileOutputStream fw = new FileOutputStream("files/b.png");
+        int len ;
+        while((len = fr.read())!= -1) {
+            fw.write(len);
+        }
+        ```
+    * 纯文本文件用字符流，其他用字节流
+
+
+## java高级__反射
+反射：在程序运行期间，根据类的字节码文件获取并使用类。
+* 反射的作用：
+    * 分析类：加载并初始化一个类
+    * 查看并使用对象
+    * 类加载的时机：
+        * 创建类的实例
+        * 访问类的静态成员
+        * 初始化类的子类
+        * 反射方式创建类的初始化对象（使用类的正名）
+    * 获取class对象的三种方式：
+        * object类的getClass方法 class clazz = 对象名.getClass();
+        * 类的静态属性 class clazz = 类名.clazz
+        * Class类的静态方法 Class clazz = Class.forName("类的正名");
+    * 反射获取构造器方法并使用 getConstructors()
+    * 反射获取成员方法并使用 getMethod() getMethods()
+    * 反射获取成员变量并使用
