@@ -8,9 +8,36 @@
         * [概览](#概览)
         * [不可变的好处](#不可变的好处)
         * [String,stringBuffer and StringBuilder](#String)
-        * [String Poll](#poll)
-        * [new String("abc")](#)
-
+        * [String Poll](#StringPoll)
+        * [new String("abc")]()
+    * [三、运算](#运算)
+        * [参数传递]()
+        * [float与double]
+        * [隐式类型转换]
+        * [switch]
+    * [四、关键字](#关键字)
+        * [final]
+        * [static]
+    * [五、Object通用方法](#Object通用方法)
+        * [概览]
+        * [equals()]
+        * [hashCode()]
+        * [toString]
+        * [clone()]
+    * [六、继承](#继承)
+        * [访问权限]
+        * [抽象类与接口]
+        * [super]
+        * [重写与重载]
+    * [七、反射](#反射)
+    * [八、异常](#异常)
+    * [九、泛型](#泛型)
+    * [十、注解](#注解)
+    * [十一、特性](#特性)
+        * java各版本的特性
+        * java与C++的区别
+        * JRE or JDK
+    * [补充](#补充)
 ## 一、数据类型 <div id="数据类型"></div>
 ### 基本类型
     * byte 8
@@ -150,7 +177,7 @@ String不可变性天生具备线程安全，可以在多个线程中安全地�
 * StringBuilder不是线程安全的。
 
 [StackOverflow : String, StringBuffer, and StringBuilder](https://stackoverflow.com/questions/2971315/string-stringbuffer-and-stringbuilder)
-### String Poll
+### String Poll <div id="StringPoll"></div>
 字符串常量池保存着所有字符串字面量，这些字面量在编译时就确定，不仅如此，还可以使用String的intern()方法在运行过程中将字符串添加到String Poll中。
 当一个字符串调用intern()方法时，当String Poll中已经有与该字符串字面量相同的字符串(equals()方法确定)时，就会返回String Poll中该字符串的引用，否则，就会在String Poll中添加一个字符串，并返回这个新字符串的引用。
 下面示例中，使用new String()的方式和使用intern()方法创建，可以确定后者产生的同一字面量的字符指向同一字符的引用。
@@ -182,7 +209,262 @@ public class NewStringTest {
     }
 }
 ```
+使用 javap -verbose 进行反编译，得到以下内容：
+```java
+// ...
+Constant pool:
+// ...
+   #2 = Class              #18            // java/lang/String
+   #3 = String             #19            // abc
+// ...
+  #18 = Utf8               java/lang/String
+  #19 = Utf8               abc
+// ...
 
+  public static void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    flags: ACC_PUBLIC, ACC_STATIC
+    Code:
+      stack=3, locals=2, args_size=1
+         0: new           #2                  // class java/lang/String
+         3: dup
+         4: ldc           #3                  // String abc
+         6: invokespecial #4                  // Method java/lang/String."<init>":(Ljava/lang/String;)V
+         9: astore_1
+// ...
+```
+在Constant Poll中，#19代表字符串字面量，#3代表对象引用#19字符串。在main方法中,0:行创建一个对象，ldc #3将字面量作为Strin对象的构造函数的参数。
+以下是String构造函数的源码，可以发现在使用参数构造时，并不是将value数组复制，而是都会指向同一个数组。
+```java
+public String(String original) {
+    this.value = original.value;
+    this.hash = original.hash;
+}
+```
+## 三、运算 <div id="运算"></div>
+### 参数传递
+java的值是以值传递传入方法中的，而不是引用传递。  
+在以下代码中，dog是一个指针，指向的是对象的地址。在将一个参数传递到一个方法时，本质上是将参数的地址以值的方式传递到形参中。
+```java
+public class Dog {
+
+    String name;
+
+    Dog(String name) {
+        this.name = name;
+    }
+
+    String getName() {
+        return this.name;
+    }
+
+    void setName(String name) {
+        this.name = name;
+    }
+
+    String getObjectAddress() {
+        return super.toString();
+    }
+}
+```
+在方法中该改变对象的字段值会改变原对象的字段值，因为引用的是同一个对象。
+```java
+class PassByValueExample {
+    public static void main(String[] args) {
+        Dog dog = new Dog("A");
+        func(dog);
+        System.out.println(dog.getName());          // B
+    }
+
+    private static void func(Dog dog) {
+        dog.setName("B");
+    }
+}
+```
+但是在方法中将指针引用了其它对象，此时方法里和方法外指向不同的对象，在一个指针改变所指向的对象对另一个指针没有影响。
+```java
+public class PassByValueExample {
+    public static void main(String[] args) {
+        Dog dog = new Dog("A");
+        System.out.println(dog.getObjectAddress()); // Dog@4554617c
+        func(dog);
+        System.out.println(dog.getObjectAddress()); // Dog@4554617c
+        System.out.println(dog.getName());          // A
+    }
+
+    private static void func(Dog dog) {
+        System.out.println(dog.getObjectAddress()); // Dog@4554617c
+        dog = new Dog("B");
+        System.out.println(dog.getObjectAddress()); // Dog@74a14482
+        System.out.println(dog.getName());          // B
+    }
+}
+```
+[StackOverflow: Is Java “pass-by-reference” or “pass-by-value”?](https://stackoverflow.com/questions/40480/is-java-pass-by-reference-or-pass-by-value)
+
+### float与double
+java不能隐式执行类型向下转换，因为这样会使精度降低。
+1.1字面量是double类型不能直接复制给float类型，因为这是向下转型。  
+`// float f = 1.1;`  
+1.1f才是float类型。  
+`float f = 1.1f;`
+
+### 隐式类型转换
+因为字面量1是int类型，short是精度更高的类型，因此int不能隐式地向下转为short类型。
+```java
+short s1 = 1;
+// s1 = s1 + 1;
+```
+但是使用+=或++运算符会实现隐式类型转换
+```java
+s1 += 1;
+s1++;
+```
+上面地语句相当于将s1+1地结果进行了向下转型
+`s1 = (short) (s1 + 1);`
+### swicth
+从java7开始，可以在switch条件语句中使用String对象。
+```Java
+String s = "a";
+switch (s) {
+    case "a":
+        System.out.println("aaa");
+        break;
+    case "b":
+        System.out.println("bbb");
+        break;
+}
+```
+switch不支持long float double，因为switch本来就是为少数几个值的类型进行等值判断设计的，如果数值过于复杂，还是用if语句比较合适。
+```java
+// long x = 111;
+// switch (x) { // Incompatible types. Found: 'long', required: 'char, byte, short, int, Character, Byte, Short, Integer, String, or an enum'
+//     case 111:
+//         System.out.println(111);
+//         break;
+//     case 222:
+//         System.out.println(222);
+//         break;
+// }
+```
+
+[StackOverflow : Why can't your switch statement data type be long, Java?](https://stackoverflow.com/questions/2676210/why-cant-your-switch-statement-data-type-be-long-java)
+
+## 四、关键字 <div id="关键字"></div>
+### final
+#### 1. 数据
+声明数据为常量，可以是编译时常量，也可以是在运行时被初始化后不可以被改变的常量。
+* 对于基本类型，final使数值不变
+* 对于引用类型，final使引用不变，也就是不能引用其它对象，但是对象本身可以改变。
+```java
+final int x = 1;
+// x = 2;  // cannot assign value to final variable 'x'
+final A y = new A();
+y.a = 1;
+```
+#### 2. 方法
+声明方法不能被子类重写。
+
+private方法隐式地被指定为final类型，如果在子类中定义地一个方法与基类中地一个private方法名相同，此时子类方法不是重写基类方法，而是在子类中定义了一个新的方法。
+#### 3. 类
+声明类不允许被继承。
+
+### static
+#### 1. 静态变量
+* 静态变量：又称类变量，也就是这个变量是属于类的，类的所有实例都共享静态变量，可以通过类名来访问它，静态变量在内存中只存在一份。
+* 实例变量：每创建一个实例就会产生一份实例变量，它与该实例同生共死。
+```java
+public class A {
+
+    private int x;         // 实例变量
+    private static int y;  // 静态变量
+
+    public static void main(String[] args) {
+        // int x = A.x;  // Non-static field 'x' cannot be referenced from a static context
+        A a = new A();
+        int x = a.x;
+        int y = A.y;
+    }
+}
+```
+#### 2. 静态方法
+静态方法在类加载的时候就存在了，它不依赖于任何实例。也就是说静态方法必须有实现，不能是抽象方法。
+```java
+public abstract class A {
+    public static void func1(){
+    }
+    // public abstract static void func2();  // Illegal combination of modifiers: 'abstract' and 'static'
+}
+```
+只能访问所属类的静态字段和静态方法，方法中不能有this和super，因为这两个关键词与具体对象关联。
+```java
+public class A {
+
+    private static int x;
+    private int y;
+
+    public static void func1(){
+        int a = x;
+        // int b = y;  // Non-static field 'y' cannot be referenced from a static context
+        // int b = this.y;     // 'A.this' cannot be referenced from a static context
+    }
+}
+```
+#### 3.静态语句块
+静态语句块在类初始化时运行一次。
+```java
+public class A {
+    static {
+        System.out.println("123");
+    }
+
+    public static void main(String[] args) {
+        A a1 = new A();
+        A a2 = new A();
+    }
+}
+
+123
+```
+#### 4.静态内部类
+非静态内部类依赖于外部类的实例，也就是说需要先创建外部类实例，才能用这个实例去创建非静态内部类，而静态内部类不需要。
+```java
+public class OuterClass {
+
+    class InnerClass {
+    }
+
+    static class StaticInnerClass {
+    }
+
+    public static void main(String[] args) {
+        // InnerClass innerClass = new InnerClass(); // 'OuterClass.this' cannot be referenced from a static context
+        OuterClass outerClass = new OuterClass();
+        InnerClass innerClass = outerClass.new InnerClass();
+        StaticInnerClass staticInnerClass = new StaticInnerClass();
+    }
+}
+```
+#### 5. 静态导包
+使用静态变量和方法时不再指明ClasssName，从而简化代码，但是降低了代码的可读性。
+```java
+import static com.xxx.ClassName.*
+```
+#### 6. 初始化顺序
+静态变量和静态语句块优先于实例变量和一般语句块。静态变量和静态语句块初始化的顺序取决于他们在代码中的顺序。
+
+最后才是构造函数的初始化
+  
+存在继承的情况下，初始化顺序为：
+* 父类(静态变量、静态语句块)
+* 子类(静态变量、静态语句块)
+* 父类(实例变量、普通语句块)
+* 父类(构造函数)
+* 子类(实例变量、普通语句块)
+* 子类(构造函数)
+
+### 五、Object通用方法 <div id="Object通用方法"></div>
+#### 概览
 
 
 
@@ -205,3 +487,7 @@ heap区又分：Eden Space（伊甸园）、Survivor Space(幸存者区)、Tenur
 将对象分成不同类别，其实也是按其生命周期设置合适的内存结构即对应的回收策略，是解耦合的一种体现。
 
 [什么是年轻代、老年代和永久代？](https://www.sohu.com/a/394418289_120175716)
+
+
+* javap
+javap 是 JDK 自带的反汇编器，可以查看 java 编译器为我们生成的字节码。通过它，我们可以对照源代码和字节码，从而了解很多编译器内部的工作。
