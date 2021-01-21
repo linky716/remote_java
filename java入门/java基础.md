@@ -465,6 +465,51 @@ import static com.xxx.ClassName.*
 
 ### 五、Object通用方法 <div id="Object通用方法"></div>
 #### 概览
+```java
+public native int hashCode()
+
+public boolean equals(Object obj)
+
+protected native Object clone() throws CloneNotSupportedException
+
+public String toString()
+
+public final native Class<?> getClass()
+
+protected void finalize() throws Throwable {}
+
+public final native void notify()
+
+public final native void notifyAll()
+
+public final native void wait(long timeout) throws InterruptedException
+
+public final void wait(long timeout, int nanos) throws InterruptedException
+
+public final void wait() throws InterruptedException
+```
+#### equals()
+1. 等价关系  
+两个对象具有等价关系，需要满足以下五个条件  
+I 自反性  
+`x.equals(x); //true`  
+II 对称性  
+`x.equals(y) == y.equals(x);  //true`  
+III 传递性
+```java
+if(x.equals(y) && y.equals(z)) {
+    x.equals(z);  //true
+}
+```
+IV 一致性
+`x.equals(y) == x.equals(y); //true 多次比较结果一致`  
+V 与null比较  
+除了null外的任何字符与null比较均为false  
+2. 等价相等  
+* 对于基本类型，==判断两个值是否相等，基本类型没有equals方法
+* 对于引用类型，equals()判断值是否相等，而==判断其是否引用的是同一个对象。
+
+
 
 
 
