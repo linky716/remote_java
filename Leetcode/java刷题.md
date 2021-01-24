@@ -922,3 +922,246 @@ class Solution {
     }
 
 ```
+173.二叉搜索迭代器
+* 思路：因为判断与返回最小值的时间都要求为O(1),因此参考前面返回最小栈的题目，做一个辅助栈，将搜索二叉树反中序遍历存储到辅助栈中，调用时弹出即可。
+```java
+class BSTIterator {
+    Stack<Integer> st = new Stack<>();
+    public BSTIterator(TreeNode root) {
+        dfs(root);
+    }
+    public void dfs(TreeNode root) {
+        if(root == null) return;
+        if(root.right != null) dfs(root.right);
+        st.add(root.val);
+        if(root.left != null) dfs(root.left);
+        
+    }
+    
+    public int next() {
+        return st.pop();
+    }
+    
+    public boolean hasNext() {
+        if(!st.isEmpty())
+        return true;
+        else 
+        return false;
+    }
+}
+
+```
+* 迭代：由于上述思路使用空间为O(n),不满足题目要求的h，因此需要进行优化。所以考虑将遍历过程进行存储。将左节点全部入栈，右节点在根节点出栈的时候执行相同的操作。
+```java
+class BSTIterator {
+    Stack<TreeNode> st;
+    public BSTIterator(TreeNode root) {
+        
+        st = new Stack<>();
+        TS(root);
+    }
+    public void TS(TreeNode root) {
+        st.add(root);
+        while(root.left != null) {
+            st.add(root.left);
+            root = root.left;
+        }
+        
+    }
+    public int next() {
+        TreeNode ts = st.pop();
+        if(ts.right != null)
+        TS(ts.right);
+        return ts.val;
+    }
+    public boolean hasNext() {
+        return !st.isEmpty();
+
+    }
+}
+
+```
+5.最长回文子串
+* 思路：一开始采用遍历的方式，但超时了。问题在于每当移动一个字符串，就要从当前位置重新左右遍历，因此时间复杂度很高，会超时。
+```java
+class Solution {
+    public String longestPalindrome(String s) {
+        StringBuilder str = new StringBuilder(s);
+        int len = s.length();
+        String pre="";
+        for (int i = 0;i < len; i++) {
+            for(int j =i;j<=len;j++) {
+                StringBuilder str1 = new StringBuilder(str.substring(i,j));
+                String re = str1.reverse().toString();
+                if(str.substring(i,j).equals(re))
+                pre = j-i>pre.length() ? str.substring(i,j) : pre;
+            }
+        }
+        return pre;
+    }
+}
+
+```
+* 采用答案提示的方式，考虑缩减重复遍历的部分，采用布尔数组来存放两端值是否相同，这样即使窗口移动，前面的遍历记录仍然可以使用。
+```java
+    public String longestPalindrome(String s) {
+        int n = s.length();
+        boolean[][] dp = new boolean[n][n];
+        String ans= "";
+        for (int l = 0;l<n;l++) {
+            for(int i =0 ;i+l<n;i++) {
+                int j = i+l;
+                if(l==0)
+                {dp[i][j]=true;}
+                else if(l==1) {
+                    dp[i][j] = s.charAt(i)==s.charAt(j);
+                }
+                else {
+                    dp[i][j] = (s.charAt(i) == s.charAt(j) && dp[i+1][j-1]);
+                }
+                if(dp[i][j] && 1+l >ans.length())
+                ans = s.substring(i,i+l+1);
+            }
+        }
+        return ans;
+    }
+
+```
+* 使用中心扩展的方法：考虑两种情况，第一种中心字符是单个字符，这样就将字符串以单个字符为中心向两边扩展。另一种是中心字符是两个，以两个字符为中心向外扩展。根据扩展长度计算上下界即可。
+```java
+class Solution {
+    public String longestPalindrome(String s) {
+        int n = s.length();
+        if(n==0 || n==1)
+        return s;
+        String ans = "";
+        int start = 0,end = 0;
+        for (int i = 0;i < n;i++) {
+            int len1 = boll(s,i,i);
+            int len2 = boll(s,i,i+1);
+            int len = Math.max(len1,len2);
+            if(len > end -start) {
+                start = i - (len-1)/2;
+                end = i+len/2;
+                
+            }
+        }
+        return  s.substring(start,end+1);
+    }
+    public int boll(String s,int left,int right) {
+        while(left >=0 && right < s.length() && s.charAt(left) ==s.charAt(right) ) {
+            --left;
+            ++right;
+        }
+        return right - left -1;
+    }
+}
+
+```
+6.Z字变换
+* 思路：按照顺序将字符串放入StringBuilder数组中，然后再拼接起来，在存放的过程中，行是变换的，因此可以添加一个移动行序的变量。思路上相当于真实地摆出Z字形，然后直接提取字符串即可。难点在于实现方式。
+```java
+class Solution {
+    public String convert(String s, int numRows) {
+        if (numRows == 1)
+        return s;
+        List<StringBuilder> rows = new ArrayList<StringBuilder>();
+        for (int i =0;i< Math.min(numRows,s.length());i++) {
+            rows.add(new StringBuilder());
+        }
+        int curRow = 0;
+        boolean goDown = false;
+
+        for(char c : s.toCharArray()) {
+            rows.get(curRow).append(c);
+            if(curRow == 0|| curRow == numRows-1) goDown = !goDown;
+            curRow+= goDown?1:-1; 
+        }
+        StringBuilder ans = new StringBuilder();
+        for(StringBuilder str : rows) {
+            ans.append(str);
+        }
+        return ans.toString();
+    }
+}
+
+```
+* 直接按照字符的取值间隔计算，这样做的难点是字符的序列位置不好推算。
+```java
+class Solution {
+    public String convert(String s, int numRows) {
+        int n = s.length();
+        if(numRows == 1)
+        return s;
+        int cycle = 2*numRows -2;
+        StringBuilder ret = new StringBuilder();
+        for(int i = 0;i< numRows;i++) {
+            for(int j = 0;j + i <n;j += cycle) {
+                ret.append(s.charAt(i+j));
+                if(i != 0 && i != numRows -1 && j+cycle-i <n) 
+                ret.append(s.charAt(j+cycle-i));
+            }
+        }
+        return ret.toString();
+    }
+}
+
+```
+
+24.两两交换链表中的节点
+* 思路：节点两个一组，互换位置就可以了。使用递归是一个比较好的办法。
+```java
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if(head ==null || head.next == null) {
+            return head;
+        }
+        ListNode ls = head.next;
+        head.next = swapPairs(ls.next);
+        ls.next = head;
+        return ls;
+    }
+}
+```
+29.两数相除
+* 思路：除法的机制就是找出最大倍数的因子并累加。因此要经过一个倍数叠加的过程，再就是对边界条件的处理，讨论1和-1两种情况。
+```java
+class Solution {
+    public int divide(int dividend, int divisor) {
+        if(divisor == 1) {
+            return dividend < Integer.MAX_VALUE ? dividend:Integer.MAX_VALUE;
+        }
+        if(divisor == -1) {
+            if(dividend <= -2147483648)
+            return Integer.MAX_VALUE;
+            else return -dividend;
+        }
+
+        long a = dividend,b = divisor;
+        int sgn = 1;
+        if((a>0 && b<0) || (a<0 && b>0))
+        sgn = -1;
+        a = a>0?a:-a;
+        b = b>0?b:-b;
+        int ans = div(a,b);
+        if(sgn >0)return ans ;
+        else return -ans;
+    }
+    public int div(long a,long b) {
+        if(a<b)return 0;
+        long count = 1;
+        long tb = b;
+        while(tb+tb <= a) {
+            count = 2*count;
+            tb = tb + tb;
+        }
+        return (int)count+div(a-tb,b); 
+    } 
+}
+```
+
+31.下一个排列
+* 思路：要注意的是下一个排列的值只比前一个排列大。这样的话除了要用大数替代反序位置的数，还要考虑是不是有更小的较大数放在高位，同时对尾列进行处理。
+```java
+
+```
