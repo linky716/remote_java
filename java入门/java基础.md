@@ -1,5 +1,5 @@
-# java基础
-* java基础 
+# [java基础](#java基础)
+* java基础 <div id="java基础"></div>
     * [一、数据类型](#数据类型)
         * [基本类型](#基本类型) 
         * [包装类型](#包装类型)
@@ -7,16 +7,16 @@
     * [二、String](#String)
         * [概览](#概览)
         * [不可变的好处](#不可变的好处)
-        * [String,stringBuffer and StringBuilder](#String)
+        * [String,stringBuffer and StringBuilder]()
         * [String Poll](#StringPoll)
-        * [new String("abc")]()
+        * [new String("abc")](#abc)
     * [三、运算](#运算)
         * [参数传递]()
         * [float与double]
         * [隐式类型转换]
         * [switch]
     * [四、关键字](#关键字)
-        * [final]
+        * [final](#final)
         * [static]
     * [五、Object通用方法](#Object通用方法)
         * [概览]
@@ -167,7 +167,7 @@ String不可变性天生具备线程安全，可以在多个线程中安全地�
 
 [Program Creek : Why String is immutable in Java?](https://www.programcreek.com/2013/04why-string-is-immutable-in-java/)
 
-### String,StringBuilder and StringBuffer <div id="String"></div>
+### String,StringBuilder and StringBuffer <span id="String"> </span>
 1. 可变性
 * String不可变性
 * StringBuilder和StringBuffer可变
@@ -177,7 +177,7 @@ String不可变性天生具备线程安全，可以在多个线程中安全地�
 * StringBuilder不是线程安全的。
 
 [StackOverflow : String, StringBuffer, and StringBuilder](https://stackoverflow.com/questions/2971315/string-stringbuffer-and-stringbuilder)
-### String Poll <div id="StringPoll"></div>
+### StringPoll <div id="StringPoll"></div>
 字符串常量池保存着所有字符串字面量，这些字面量在编译时就确定，不仅如此，还可以使用String的intern()方法在运行过程中将字符串添加到String Poll中。
 当一个字符串调用intern()方法时，当String Poll中已经有与该字符串字面量相同的字符串(equals()方法确定)时，就会返回String Poll中该字符串的引用，否则，就会在String Poll中添加一个字符串，并返回这个新字符串的引用。
 下面示例中，使用new String()的方式和使用intern()方法创建，可以确定后者产生的同一字面量的字符指向同一字符的引用。
